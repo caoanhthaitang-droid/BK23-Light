@@ -49,6 +49,13 @@ input[type=text],select{flex:1;background:#0f0e14;color:var(--tx);border:1px sol
 <p class="note">Có khói thì tia sáng hiện rõ. Máy khói công suất lớn nên phun theo từng đợt ngắn.</p></section>
 <section><h2>Blinder (4 bóng)</h2>
 <div class="row"><button id="b2">Bật 2 bóng (1 mỗi trụ)</button><button id="b4" class="on">Bật cả 4 bóng</button></div></section>
+<section><h2>Danh sách cue</h2>
+<div class="row"><button id="cu_back">◀ Lùi</button><button id="cu_go" class="on" style="flex:1">GO ▶ (phím cách)</button></div>
+<p class="note" id="cu_st"></p><div id="cues"></div>
+<label style="margin-top:10px"><b>Bản lưu</b><select id="cu_s"></select></label>
+<label><b>Chuyển (giây)</b><input id="cu_f" type="number" min="0" max="60" step="0.5" value="2" style="flex:1;background:#0f0e14;color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;min-width:0"></label>
+<label><b>Ghi chú</b><input id="cu_n" type="text" maxlength="60" placeholder="Ví dụ: khi A bước ra"></label>
+<button id="cu_add">Thêm cue</button></section>
 <section><h2>Bản lưu (look và mood)</h2>
 <label><b>Tên</b><input id="sv_n" type="text" maxlength="40" placeholder="Ví dụ: Cảnh 2, phòng khách"></label>
 <label><b>Nhóm</b><input id="sv_g" type="text" maxlength="30" placeholder="Tên nhóm"></label>
@@ -148,7 +155,7 @@ function beam(f,t){let I=f.int*master;if(f.type=='bl'&&!f.on)I=0;if(I<=0.01)retu
  pg.addColorStop(0,c(pa));pg.addColorStop(.6,c(pa*.5));pg.addColorStop(1,c(0));
  ctx.fillStyle=pg;ctx.beginPath();ctx.ellipse(f.tx,f.ty,pr*1.25,pr*.9,a,0,7);ctx.fill();ctx.restore()}
 let last=0;
-function frame(ms){const t=ms/1000,dt=Math.min(.05,t-last);last=t;
+function frame(ms){const t=ms/1000,dt=Math.min(.05,t-last);last=t;if(fade){const k=Math.min(1,(t-fade.t0)/fade.secs),e=k*k*(3-2*k);F.forEach((f,i)=>{const a=fade.from[i],b=fade.to[i];['tx','ty','int','beam','strobe'].forEach(p=>f[p]=a[p]+(b[p]-a[p])*e);f.col=a.col.map((v,j)=>v+(b.col[j]-v)*e)});bgCol=hex(fade.bg0.map((v,j)=>v+(fade.bg1[j]-v)*e));if(k>=1){auto=fade.au;bgCol=fade.bgEnd;fade=null}}
  if(auto=='party'){F.forEach((f,i)=>{if(f.type!='bl'){const hh=(t*60+i*45)%360;f.col=hsl(hh);f.int=.95}else{f.col=[255,255,255];f.int=Math.floor(t*3)%4==i?1:0}});mhs.forEach((f,i)=>{f.tx=430+Math.sin(t*1.5+i*2)*200*(i?-1:1);f.ty=170+Math.cos(t*2.1+i)*90})}
  if(auto=='tense'){mhs.forEach((f,i)=>{f.tx=430+Math.sin(t*.5+i*3)*150;f.ty=160+Math.sin(t*.7+i)*70});pars.forEach((f,i)=>f.int=.55+.25*Math.sin(t*1.2+i))}
  mhs.forEach((f,i)=>{if(f.sweep&&!auto){f.tx=430+Math.sin(t*1.1+i*2.5)*190;f.ty=170+Math.cos(t*1.6+i)*80}});
@@ -268,19 +275,41 @@ const toArr=o=>Object.keys(o).map(k=>({id:k,...o[k]}));
 async function putSave(id,meta){const d={name:meta.name,group:meta.group,mood:meta.mood,snap:snap(),ts:Date.now()};id=id||Date.now().toString(36)+Math.random().toString(36).slice(2,5);
  try{if(db)await db.collection('looks').doc(id).set(d);else{const l=lsGet();l[id]=d;localStorage.setItem('looks',JSON.stringify(l));saves=toArr(l);renderSaves()}note('Đã lưu "'+meta.name+'".')}catch(e){note('Không lưu được: '+((e&&(e.message||e.code))||'lỗi không rõ'))}}
 function two(b,label,fn){const t=b.textContent;b.onclick=()=>{if(b.dataset.arm){clearTimeout(+b.dataset.arm);b.dataset.arm='';b.textContent=t;fn();return}b.textContent=label;b.dataset.arm=setTimeout(()=>{b.dataset.arm='';b.textContent=t},3000)}}
-function renderSaves(){const box=G('saves');box.textContent='';const f=G('sv_f').value,arr=saves.filter(s=>!f||s.mood===f).sort((a,b)=>b.ts-a.ts);
+function renderSaves(){renderCues();const box=G('saves');box.textContent='';const f=G('sv_f').value,arr=saves.filter(s=>!f||s.mood===f).sort((a,b)=>b.ts-a.ts);
  if(!arr.length){const p=document.createElement('p');p.className='note';p.textContent='Chưa có bản lưu nào.';box.appendChild(p);return}
  arr.forEach(s=>{const d=document.createElement('div');d.className='sv';const nm=document.createElement('b');nm.textContent=s.name;const sm=document.createElement('small');sm.textContent=(s.group||'Chưa ghi nhóm')+' | '+s.mood+' | '+new Date(s.ts).toLocaleDateString('vi-VN');
   const r=document.createElement('div');r.className='row';const mb=(t,fn)=>{const b=document.createElement('button');b.textContent=t;r.appendChild(b);return b};
   mb('Mở').onclick=()=>{try{applySnap(s.snap);note('Đã mở "'+s.name+'".')}catch(e){note('Bản lưu này bị lỗi, không mở được.')}};
   two(mb('Ghi đè'),'Bấm lần nữa để ghi đè',()=>putSave(s.id,s));two(mb('Xóa'),'Bấm lần nữa để xóa',async()=>{try{if(db)await db.collection('looks').doc(s.id).delete();else{const l=lsGet();delete l[s.id];localStorage.setItem('looks',JSON.stringify(l));saves=toArr(l);renderSaves()}}catch(e){note('Không xóa được.')}});
   d.append(nm,sm,r);box.appendChild(d)})}
+let cues=[],cur=-1,fade=null;
+function startFade(str,secs){const s=JSON.parse(str);if(!Array.isArray(s.F)||s.F.length!=F.length)throw 0;
+ if(!(secs>.05)){fade=null;applySnap(str);return}
+ const P=['tx','ty','int','beam','strobe'],cp=f=>{const o={col:f.col.slice()};P.forEach(p=>o[p]=f[p]||0);return o};
+ const from=F.map(cp),bg0=rgb(bgCol);fade=null;applySnap(str);const to=F.map(cp),bg1=rgb(bgCol),bgEnd=bgCol,au=auto;
+ F.forEach((f,i)=>{P.forEach(p=>f[p]=from[i][p]);f.col=from[i].col.slice()});auto=null;bgCol=hex(bg0);
+ fade={t0:performance.now()/1000,secs,from,to,bg0,bg1,bgEnd,au}}
+function cueSave(){const s=JSON.stringify(cues);try{if(db)db.doc('cues/main').set({list:s,ts:Date.now()});else localStorage.setItem('cues',s)}catch(e){}}
+function playCue(i){if(i<0||i>=cues.length)return;const c=cues[i],s=saves.find(x=>x.id==c.sid);if(!s){G('cu_st').textContent='Cue '+(i+1)+': bản lưu đã bị xóa.';return}
+ try{startFade(s.snap,c.fade);cur=i;renderCues()}catch(e){G('cu_st').textContent='Không chạy được cue '+(i+1)+'.'}}
+function mv(i,d){const j=i+d;if(j<0||j>=cues.length)return;[cues[i],cues[j]]=[cues[j],cues[i]];if(cur==i)cur=j;else if(cur==j)cur=i;cueSave();renderCues()}
+function renderCues(){const sl=G('cu_s'),v=sl.value;sl.textContent='';saves.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>sl.add(new Option(s.name+' ('+s.mood+')',s.id)));if(v)sl.value=v;
+ const box=G('cues');box.textContent='';
+ cues.forEach((c,i)=>{const s=saves.find(x=>x.id==c.sid),d=document.createElement('div');d.className='sv';if(i==cur)d.style.borderColor='var(--acc)';
+  const nm=document.createElement('b');nm.textContent=(i+1)+'. '+(s?s.name:'(bản lưu đã xóa)');const sm=document.createElement('small');sm.textContent='Chuyển '+c.fade+' giây'+(c.note?' | '+c.note:'');
+  const r=document.createElement('div');r.className='row';const mb=(t,fn)=>{const b=document.createElement('button');b.textContent=t;b.onclick=fn;r.appendChild(b)};
+  mb('Chạy',()=>playCue(i));mb('▲',()=>mv(i,-1));mb('▼',()=>mv(i,1));mb('Xóa',()=>{cues.splice(i,1);if(cur>=cues.length)cur=cues.length-1;cueSave();renderCues()});
+  d.append(nm,sm,r);box.appendChild(d)});
+ G('cu_st').textContent=cues.length?(cur>=0?'Đang ở cue '+(cur+1)+' / '+cues.length:'Sẵn sàng, bấm GO để chạy cue 1.'):'Thêm bản lưu vào danh sách để bắt đầu.'}
+G('cu_add').onclick=()=>{const sid=G('cu_s').value;if(!sid)return;cues.push({sid,fade:Math.max(0,Math.min(60,+G('cu_f').value||0)),note:G('cu_n').value.trim()});G('cu_n').value='';cueSave();renderCues()};
+G('cu_go').onclick=()=>playCue(cur+1>=cues.length?cur:cur+1);G('cu_back').onclick=()=>playCue(Math.max(0,cur-1));
+addEventListener('keydown',e=>{const t=e.target.tagName;if(t=='INPUT'||t=='SELECT'||t=='TEXTAREA'||t=='BUTTON')return;if(e.code=='Space'){e.preventDefault();G('cu_go').click()}else if(e.key=='ArrowLeft')G('cu_back').click()});
 G('sv_save').onclick=()=>{const n=G('sv_n').value.trim();if(!n){note('Hãy đặt tên cho bản lưu.');return}putSave(null,{name:n,group:G('sv_g').value.trim(),mood:G('sv_m').value})};
 (async()=>{G('sv_exp').style.display='none';
  if(typeof claude!='undefined'){try{db=await claude.use('db')}catch(e){db=null}
   try{const dl=await claude.use('downloads');if(dl){G('sv_exp').style.display='';G('sv_exp').onclick=async()=>{try{await dl.save({filename:'ban-luu-anh-sang.json',data:JSON.stringify(saves.map(({id,...r})=>r))})}catch(e){}}}}catch(e){}}
- if(db){db.collection('looks').onSnapshot(q=>{saves=q.docs.map(d=>({id:d.id,...d.data()}));renderSaves()},e=>note('Không đọc được bản lưu chung.'));note('Bản lưu dùng chung: mọi người mở trang này đều thấy.')}
- else{saves=toArr(lsGet());renderSaves();note('Bản lưu chỉ nằm trên máy này (chưa đăng nhập hoặc chưa có quyền).')}})();
+ if(db){db.doc('cues/main').onSnapshot(q=>{if(q.exists){try{cues=JSON.parse(q.data().list)}catch(e){}renderCues()}},()=>{});db.collection('looks').onSnapshot(q=>{saves=q.docs.map(d=>({id:d.id,...d.data()}));renderSaves()},e=>note('Không đọc được bản lưu chung.'));note('Bản lưu dùng chung: mọi người mở trang này đều thấy.')}
+ else{try{cues=JSON.parse(localStorage.getItem('cues')||'[]')}catch(e){}saves=toArr(lsGet());renderSaves();note('Bản lưu chỉ nằm trên máy này (chưa đăng nhập hoặc chưa có quyền).')}})();
 setScene(1);requestAnimationFrame(frame);
 </script>
 </body>
