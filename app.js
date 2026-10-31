@@ -1508,6 +1508,148 @@ G('sv_save').onclick = () => {
   initGroups();
   route();
 })();
+// 1. Thêm biến kích thước sân khấu động (đơn vị mét)
+let stageWidthM = 14;
+let stageDepthM = 9;
+
+// 2. Cập nhật hàm khởi tạo / vẽ lại sàn sân khấu 3D khi đổi kích thước
+function updateStageSize3D() {
+  if (!sc3 || !stg) return;
+  
+  // Xóa mesh sân khấu và phông cũ
+  sc3.remove(stg);
+  sc3.remove(bd);
+
+  // Tạo sàn sân khấu mới theo kích thước người dùng nhập
+  const stgGeo = new THREE.PlaneGeometry(stageWidthM, stageDepthM);
+  stg = new THREE.Mesh(stgGeo, mapM(TX.wood(), 0xffffff, stageWidthM / 4, stageDepthM / 4));
+  stg.rotation.x = -Math.PI / 2;
+  stg.position.y = 0.02;
+  sc3.add(stg);
+
+  // Tạo lại phông nền hậu đài
+  bd = new THREE.Mesh(new THREE.PlaneGeometry(stageWidthM, 6), mapM(TX.fabric(), bgCol, 3, 1));
+  bd.position.set(0, 3, -stageDepthM / 2);
+  sc3.add(bd);
+}
+
+// 3. Xử lý sự kiện thay đổi Kích thước sân khấu
+document.getElementById('stg_w').onchange = (e) => {
+  stageWidthM = Math.max(8, Math.min(25, +e.target.value || 14));
+  updateStageSize3D();
+};
+document.getElementById('stg_d').onchange = (e) => {
+  stageDepthM = Math.max(5, Math.min(15, +e.target.value || 9));
+  updateStageSize3D();
+};
+
+// 4. Xử lý các Preset Camera 3D
+document.getElementById('cam_front').onclick = () => { az = 0; el = 0.15; rad = 14; }; // Góc nhìn khán giả thẳng mặt
+document.getElementById('cam_foh').onclick = () => { az = 0; el = 0.35; rad = 18; };   // Góc nhìn bàn đạo diễn cao hơn
+document.getElementById('cam_top').onclick = () => { az = 0; el = 1.45; rad = 15; };   // Góc nhìn từ trên xuống (Plan View)
+
+// Ẩn/Hiện hàng nút camera khi chuyển chế độ 3D/2D
+const origSetView = setView;
+setView = function(v) {
+  origSetView(v);
+  document.getElementById('cam_preset_row').style.display = v ? 'flex' : 'none';
+};
+let autoFollowTimer = null;
+
+// 1. Thêm tham số Delay và AutoFollow khi bấm "Thêm cue"
+G('cu_add').onclick = () => {
+  if (!canEd()) return;
+  const sid = G('cu_s').value;
+  if (!sid) return;
+  
+  cues.push({
+    sid,
+    fade: Math.max(0, Math.min(60, +G('cu_f').value || 0)),
+    delay: Math.max(0, Math.min(60, +G('cu_d').value || 0)),
+    autoNext: G('cu_auto').checked,
+    note: G('cu_n').value.trim()
+  });
+  
+  G('cu_n').value = '';
+  cueSave();
+  renderCues();
+};
+
+// 2. Nâng cấp hàm playCue với cơ chế Auto-follow
+function playCue(i) {
+  if (i < 0 || i >= cues.length) return;
+  if (autoFollowTimer) clearTimeout(autoFollowTimer);
+
+  const c = cues[i], s = saves.find(x => x.id == c.sid);
+  if (!s) {
+    G('cu_st').textContent = 'Cue ' + (i + 1) + ': bản lưu đã bị xóa.';
+    return;
+  }
+  
+  try {
+    startFade(s.snap, c.fade);
+    cur = i;
+    renderCues();
+
+    // Nếu Cue có bật Tự động chạy Cue tiếp theo
+    if (c.autoNext && i + 1 < cues.length) {
+      const totalTimeMs = (c.fade + (c.delay || 0)) * 1000;
+      G('cu_st').textContent = `Đang chạy Cue ${i + 1}. Chờ ${totalTimeMs / 1000}s để sang Cue ${i + 2}...`;
+      
+      autoFollowTimer = setTimeout(() => {
+        playCue(i + 1);
+      }, totalTimeMs);
+    }
+  } catch (e) {
+    G('cu_st').textContent = 'Không chạy được cue ' + (i + 1) + '.';
+  }
+}
+
+// 3. Tính năng xuất Kịch bản Ánh sáng (Lighting Cue Sheet) dạng bảng in
+G('cu_export_sheet').onclick = () => {
+  const w = window.open('', '_blank');
+  if (!w) return;
+  
+  const rows = cues.map((c, i) => {
+    const s = saves.find(x => x.id == c.sid);
+    return `<tr>
+      <td><b>Cue ${i + 1}</b></td>
+      <td>${s ? esc(s.name) : '(Đã xóa)'}</td>
+      <td>${s ? esc(s.mood) : '-'}</td>
+      <td>${c.fade}s</td>
+      <td>${c.delay || 0}s</td>
+      <td>${c.autoNext ? 'Có' : 'Không'}</td>
+      <td>${esc(c.note || '')}</td>
+    </tr>`;
+  }).join('');
+
+  w.document.write(`<!doctype html>
+  <meta charset="utf-8">
+  <title>Kịch bản Ánh sáng - ${gname()}</title>
+  <style>
+    body{font:14px sans-serif;padding:20px;color:#111;}
+    table{border-collapse:collapse;width:100%;margin-top:12px;}
+    td,th{border:1px solid #444;padding:8px 10px;text-align:left;}
+    th{background:#f0f0f0;}
+    h2{margin-bottom:4px;}
+  </style>
+  <h2>KỊCH BẢN ĐIỀU KHIỂN ÁNH SÁNG (CUE SHEET)</h2>
+  <p><b>Nhóm thực hiện:</b> ${gname()} | <b>Ngày xuất:</b> ${new Date().toLocaleDateString('vi-VN')}</p>
+  <table>
+    <tr>
+      <th>STT</th>
+      <th>Tên cảnh (Look)</th>
+      <th>Mood</th>
+      <th>Thời gian Fade</th>
+      <th>Thời gian Chờ</th>
+      <th>Tự động Next</th>
+      <th>Ghi chú thời điểm (Music/Line)</th>
+    </tr>
+    ${rows}
+  </table>
+  <script>window.print();</script>`);
+  w.document.close();
+};
 
 route();
 setScene(1);

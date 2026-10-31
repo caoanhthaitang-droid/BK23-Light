@@ -60,6 +60,16 @@
           <input id="cu_n" type="text" maxlength="60" placeholder="Ví dụ: khi A bước ra">
         </label>
         <button id="cu_add">Thêm cue</button>
+        <label>
+        <b>Chờ (giây)</b>
+          <input id="cu_d" type="number" min="0" max="60" step="0.5" value="0" placeholder="Thời gian giữ cue">
+        </label>
+        <label style="display:inline-flex;margin-top:4px;">
+          <input type="checkbox" id="cu_auto"> Tự động chạy Cue tiếp (Auto-follow)
+        </label>
+        <div class="row" style="margin-top:8px;">
+          <button id="cu_export_sheet">Xuất kịch bản Cue (PDF/In)</button>
+        </div>
       </section>
       <section id="sec-saves">
         <h2>Bản lưu (look và mood)</h2>
@@ -88,6 +98,32 @@
       </section>
     </aside>
 
+    <!-- Thêm vào bên cạnh nút Sơ đồ 2D / Xem 3D trong #stagebox -->
+    <div class="row" style="margin-bottom:8px">
+      <button id="v2" class="on">Sơ đồ 2D</button>
+      <button id="v3b">Xem 3D</button>
+      <label style="display:inline-flex;margin:0 0 0 8px">
+        <input type="checkbox" id="lbl" checked>Nhãn đèn (3D)
+      </label>
+    </div>
+
+    <!-- NÚT GÓC NHÌN CAMERA 3D & KÍCH THƯỚC -->
+    <div class="row" id="cam_preset_row" style="margin-bottom:8px; display:none;">
+      <button id="cam_front">Khán giả</button>
+      <button id="cam_foh">Bàn đạo diễn (FOH)</button>
+      <button id="cam_top">Từ trên xuống</button>
+    </div>
+
+    <div class="row" style="margin-top:6px;">
+      <label style="flex:1">
+        <b>Rộng SK (m)</b>
+        <input id="stg_w" type="number" min="8" max="25" value="14" style="width:60px">
+      </label>
+      <label style="flex:1">
+        <b>Sâu SK (m)</b>
+        <input id="stg_d" type="number" min="5" max="15" value="9" style="width:60px">
+      </label>
+    </div>
     <div id="stagebox">
       <div class="row" style="margin-bottom:8px">
         <button id="v2" class="on">Sơ đồ 2D</button>
