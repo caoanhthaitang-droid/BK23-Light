@@ -142,8 +142,46 @@
     if (!mf.isDrag()) mf.set(master);
     $('master-val').textContent = Math.round(master * 100) + '%';
     $('con_cue').textContent = $('cu_st').textContent;
-    if (!$('dmxmon').hidden) drawMon();
+    if (!$('dmxmon').hidden && mon.offsetParent !== null) drawMon();
   }
   setInterval(tick, 90);
   tick();
+})();
+
+/* ---------- bố cục: đổi giữa Bàn DMX và Cổ điển, vừa khít sân khấu, tab điện thoại ---------- */
+(function () {
+  const $ = id => document.getElementById(id), B = document.body;
+  let lay = 'dmx'; try { lay = localStorage.getItem('layout') === 'classic' ? 'classic' : 'dmx'; } catch (e) {}
+
+  function fit() {
+    const wrap = $('stagewrap'); if (!wrap || wrap.offsetParent === null) return;
+    const w = innerWidth, deskDmx = B.classList.contains('lay-dmx') && w >= 1100;
+    const ah = deskDmx ? wrap.clientHeight : (w >= 1100 ? innerHeight - 130 : innerHeight * (w < 700 ? 0.34 : 0.42));
+    const aw = wrap.clientWidth - 2;
+    const s = Math.max(0.2, Math.min(aw / 860, (ah - 2) / 640));
+    const cw = Math.floor(860 * s) + 'px', ch = Math.floor(640 * s) + 'px';
+    [$('c'), document.querySelector('#w3 canvas')].forEach(c => { if (c) { c.style.width = cw; c.style.height = ch; } });
+  }
+  function applyLay() {
+    B.classList.toggle('lay-dmx', lay === 'dmx');
+    B.classList.toggle('lay-classic', lay === 'classic');
+    $('lay_t').textContent = 'Bố cục: ' + (lay === 'dmx' ? 'Bàn DMX' : 'Cổ điển');
+    fit(); setTimeout(fit, 60);
+  }
+  $('lay_t').onclick = () => { lay = lay === 'dmx' ? 'classic' : 'dmx'; try { localStorage.setItem('layout', lay); } catch (e) {} applyLay(); };
+
+  const setTab = t => { B.dataset.tab = t; document.querySelectorAll('#mtabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t)); };
+  document.querySelectorAll('#mtabs button').forEach(b => { b.onclick = () => setTab(b.dataset.tab); });
+  // chọn đèn trên sân khấu thì tự nhảy sang tab Thiết bị (điện thoại)
+  let before = null;
+  $('c').addEventListener('pointerdown', () => { before = sel; });
+  $('c').addEventListener('pointerup', () => { if (innerWidth < 1100 && sel && sel !== before) setTab('dev'); });
+
+  $('con_fold').onclick = () => { const f = $('console').classList.toggle('folded'); $('con_fold').classList.toggle('on', f); $('con_fold').textContent = f ? 'Mở rộng' : 'Thu gọn'; fit(); };
+  $('mon_t').addEventListener('click', () => setTimeout(fit, 30));
+  $('v2').addEventListener('click', () => setTimeout(fit, 60));
+  $('v3b').addEventListener('click', () => { setTimeout(fit, 60); setTimeout(fit, 400); });
+  addEventListener('resize', fit); addEventListener('orientationchange', () => setTimeout(fit, 200));
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(fit).observe($('stagewrap'));
+  applyLay();
 })();

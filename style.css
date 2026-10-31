@@ -43,50 +43,85 @@ header span {
 
 main {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr) 300px;
-  grid-template-areas: "l stage r" "l console r";
   gap: 12px;
   padding: 12px;
   align-items: start;
 }
 
 #rail-l { grid-area: l; }
-#stagebox { grid-area: stage; }
-#console { grid-area: console; }
+#stagebox { grid-area: stage; min-width: 0; }
+#console { grid-area: console; min-width: 0; }
 #rail-r { grid-area: r; }
 
-@media (max-width: 1099px) {
-  main {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas: "stage stage" "console console" "l r";
+#mtabs { display: none; }
+
+header { padding: 8px 12px; }
+
+/* ----- Bố cục BÀN DMX, máy tính: một màn hình, sân khấu luôn thấy ----- */
+@media (min-width: 1100px) {
+  body.lay-dmx { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+  body.lay-dmx header, body.lay-dmx #gbar { flex: none; }
+  body.lay-dmx main {
+    flex: 1; min-height: 0; padding: 10px; gap: 10px; align-items: stretch;
+    grid-template-columns: 280px minmax(0, 1fr) 300px;
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas: "l stage r" "l console r";
   }
+  body.lay-dmx #rail-l, body.lay-dmx #rail-r { overflow-y: auto; min-height: 0; padding-right: 2px; }
+  body.lay-dmx #stagebox { display: flex; flex-direction: column; min-height: 0; }
+  body.lay-dmx #stagewrap { flex: 1; min-height: 0; align-items: center; }
+  body.lay-dmx #console { max-height: 50vh; overflow: auto; }
+  body.lay-dmx .fader { height: 96px; }
+  body.lay-dmx .page { flex: 1; min-height: 0; overflow: auto; width: 100%; }
 }
 
-@media (max-width: 700px) {
-  main {
+/* ----- Bố cục BÀN DMX, điện thoại và máy tính bảng: sân khấu dính trên, 3 tab ----- */
+@media (max-width: 1099px) {
+  body.lay-dmx main {
     grid-template-columns: 1fr;
     grid-template-areas: "stage" "console" "l" "r";
-    padding: 8px;
-    gap: 8px;
+    gap: 8px; padding: 8px;
   }
-  #stagebox {
-    position: sticky;
-    top: env(safe-area-inset-top, 0px);
-    z-index: 5;
-    background: var(--bg);
-    padding-bottom: 6px;
+  body.lay-dmx #stagebox {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+    background: var(--bg); padding-bottom: 6px;
   }
-  canvas#c,
-  #w3 canvas {
-    width: auto !important;
-    height: auto !important;
-    max-width: 100%;
-    max-height: max(40vh, 190px);
-    margin: 0 auto;
-  }
-  header { padding: 8px 12px; }
+  body.lay-dmx #mtabs { display: flex; gap: 6px; margin-top: 6px; }
+  body.lay-dmx #mtabs button { flex: 1; font-weight: 600; }
+  body.lay-dmx[data-tab="con"] #rail-l, body.lay-dmx[data-tab="con"] #rail-r { display: none; }
+  body.lay-dmx[data-tab="cue"] #console, body.lay-dmx[data-tab="cue"] #rail-r { display: none; }
+  body.lay-dmx[data-tab="dev"] #console, body.lay-dmx[data-tab="dev"] #rail-l { display: none; }
+  .fader { height: 120px; }
+}
+
+/* ----- Bố cục CŨ: sân khấu bên trái, mọi bảng nằm một cột bên phải ----- */
+body.lay-classic main { grid-template-columns: minmax(0, 1fr) 330px; }
+body.lay-classic #rail-l, body.lay-classic #rail-r { display: contents; }
+body.lay-classic .rail-title { display: none; }
+body.lay-classic #stagebox { grid-area: auto; grid-column: 1; grid-row: 1 / span 12; position: sticky; top: 12px; }
+body.lay-classic #console, body.lay-classic section { grid-area: auto; grid-column: 2; }
+body.lay-classic #console { order: 1; }
+body.lay-classic #sec-scenes { order: 2; }
+body.lay-classic #sec-fog { order: 3; }
+body.lay-classic #sec-bl { order: 4; }
+body.lay-classic #sec-cue { order: 5; }
+body.lay-classic #sec-saves { order: 6; }
+body.lay-classic #sec-act { order: 7; }
+body.lay-classic #sel { order: 8; }
+body.lay-classic #faders, body.lay-classic #dmxmon, body.lay-classic .con-head { display: none; }
+body.lay-classic #master-fader .fader { height: 90px; }
+body.lay-classic .master { flex-basis: 100%; }
+@media (max-width: 1099px) {
+  body.lay-classic main { grid-template-columns: 1fr; padding: 8px; gap: 8px; }
+  body.lay-classic #stagebox { grid-column: 1; grid-row: auto; order: -1; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); padding-bottom: 6px; }
+  body.lay-classic #console, body.lay-classic section { grid-column: 1; }
+}
+@media (max-width: 700px) {
   h1 { font-size: 17px; }
   header span { display: none; }
+}
+@media (max-height: 480px) {
+  body #stagebox { position: static !important; }
 }
 
 @media (pointer: coarse) {
@@ -113,6 +148,9 @@ main {
   border: 1px solid var(--line);
   border-radius: 8px;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 canvas {
@@ -369,3 +407,6 @@ h2 small { color: var(--mut); font-weight: 400; margin-left: 6px; }
 #dmxmon { margin-top: 10px; border-top: 1px solid #2c2936; padding-top: 8px; }
 #dmxmon[hidden] { display: none; }
 #mon { width: 100%; height: auto; background: #08070b; border: 1px solid #2c2936; border-radius: 6px; cursor: pointer; touch-action: auto; }
+
+#console.folded .con-body, #console.folded #dmxmon { display: none; }
+@media (pointer: coarse) { .ch-btns button { min-height: 34px; font-size: 10px; } }
