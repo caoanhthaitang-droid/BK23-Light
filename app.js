@@ -1512,26 +1512,41 @@ G('sv_save').onclick = () => {
 let stageWidthM = 14;
 let stageDepthM = 9;
 
-// 2. Cập nhật hàm khởi tạo / vẽ lại sàn sân khấu 3D khi đổi kích thước
-function updateStageSize3D() {
-  if (!sc3 || !stg) return;
-  
-  // Xóa mesh sân khấu và phông cũ
-  sc3.remove(stg);
-  sc3.remove(bd);
+// Cập nhật lại kích thước sân khấu thực tế cả 2D lẫn 3D
+function updateStageSizeReal(wM, dM) {
+  stageWidthM = Math.max(8, Math.min(25, wM));
+  stageDepthM = Math.max(5, Math.min(15, dM));
 
-  // Tạo sàn sân khấu mới theo kích thước người dùng nhập
-  const stgGeo = new THREE.PlaneGeometry(stageWidthM, stageDepthM);
-  stg = new THREE.Mesh(stgGeo, mapM(TX.wood(), 0xffffff, stageWidthM / 4, stageDepthM / 4));
-  stg.rotation.x = -Math.PI / 2;
-  stg.position.y = 0.02;
-  sc3.add(stg);
+  // 1. Cập nhật kích thước vùng sân khấu trên Sơ đồ 2D (Canvas 2D)
+  ST.w = stageWidthM * S;
+  ST.h = stageDepthM * S;
+  ST.x = (W - ST.w) / 2; // Căn giữa sân khấu theo chiều ngang
 
-  // Tạo lại phông nền hậu đài
-  bd = new THREE.Mesh(new THREE.PlaneGeometry(stageWidthM, 6), mapM(TX.fabric(), bgCol, 3, 1));
-  bd.position.set(0, 3, -stageDepthM / 2);
-  sc3.add(bd);
+  // 2. Cập nhật Sân khấu 3D (nếu Three.js đã khởi tạo)
+  if (sc3) {
+    if (stg) sc3.remove(stg);
+    if (bd) sc3.remove(bd);
+
+    // Dựng Bục Sân khấu 3D thực tế (có độ cao/độ dày 0.5m)
+    const stgGeo = new THREE.BoxGeometry(stageWidthM, 0.5, stageDepthM);
+    stg = new THREE.Mesh(stgGeo, mapM(TX.wood(), 0xffffff, stageWidthM / 4, stageDepthM / 4));
+    stg.position.set(0, 0.25, 0); // Đặt bục nổi lên trên mặt sàn
+    sc3.add(stg);
+
+    // Cập nhật phông nền hậu đài sát mép sau sân khấu
+    bd = new THREE.Mesh(new THREE.PlaneGeometry(stageWidthM, 6), mapM(TX.fabric(), bgCol, 3, 1));
+    bd.position.set(0, 3, -stageDepthM / 2);
+    sc3.add(bd);
+  }
 }
+
+// Lắng nghe thay đổi kích thước từ ô nhập liệu
+document.getElementById('stg_w').onchange = (e) => {
+  updateStageSizeReal(+e.target.value || 14, stageDepthM);
+};
+document.getElementById('stg_d').onchange = (e) => {
+  updateStageSizeReal(stageWidthM, +e.target.value || 9);
+};
 
 // 3. Xử lý sự kiện thay đổi Kích thước sân khấu
 document.getElementById('stg_w').onchange = (e) => {
@@ -1650,6 +1665,44 @@ G('cu_export_sheet').onclick = () => {
   <script>window.print();</script>`);
   w.document.close();
 };
+let currentStageShape = 'box';
+
+document.getElementById('stg_shape').onchange = (e) => {
+  currentStageShape = e.target.value;
+  buildCustomStage3D();
+};
+
+function buildCustomStage3D() {
+  if (!sc3) return;
+  if (stg) sc3.remove(stg);
+
+  let geo;
+  if (currentStageShape === 'circle') {
+    // Sân khấu hình tròn
+    geo = new THREE.CylinderGeometry(stageWidthM / 2, stageWidthM / 2, 0.5, 32);
+    stg = new THREE.Mesh(geo, mapM(TX.wood(), 0xffffff, 3, 3));
+    stg.position.set(0, 0.25, 0);
+  } else if (currentStageShape === 't_stage') {
+    // Sân khấu hình chữ T (Có đường Runway vươn ra khán phòng)
+    const group = new THREE.Group();
+    const mainStg = new THREE.Mesh(new THREE.BoxGeometry(stageWidthM, 0.5, stageDepthM), mapM(TX.wood(), 0xffffff, 3, 2));
+    mainStg.position.set(0, 0.25, 0);
+    
+    const runway = new THREE.Mesh(new THREE.BoxGeometry(3, 0.48, 6), mapM(TX.wood(), 0xffffff, 1, 2));
+    runway.position.set(0, 0.24, stageDepthM / 2 + 3);
+    
+    group.add(mainStg, runway);
+    stg = group;
+  } else {
+    // Sân khấu hộp chữ nhật chuẩn
+    geo = new THREE.BoxGeometry(stageWidthM, 0.5, stageDepthM);
+    stg = new THREE.Mesh(geo, mapM(TX.wood(), 0xffffff, stageWidthM / 4, stageDepthM / 4));
+    stg.position.set(0, 0.25, 0);
+  }
+
+  sc3.add(stg);
+}
+
 
 route();
 setScene(1);

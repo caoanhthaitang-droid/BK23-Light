@@ -123,15 +123,23 @@
         <b>Sâu SK (m)</b>
         <input id="stg_d" type="number" min="5" max="15" value="9" style="width:60px">
       </label>
+      <label style="margin-top:6px;">
+        <b>Hình dáng SK</b>
+        <select id="stg_shape">
+          <option value="box">Hình chữ nhật (Tiêu chuẩn)</option>
+          <option value="t_stage">Có sàn Catwalk (T-Shape)</option>
+          <option value="circle">Sân khấu tròn (Center Stage)</option>
+        </select>
+      </label>
     </div>
     <div id="stagebox">
-      <div class="row" style="margin-bottom:8px">
+      <!-- <div class="row" style="margin-bottom:8px">
         <button id="v2" class="on">Sơ đồ 2D</button>
         <button id="v3b">Xem 3D</button>
         <label style="display:inline-flex;margin:0 0 0 8px">
           <input type="checkbox" id="lbl" checked>Nhãn đèn (3D)
         </label>
-      </div>
+      </div> -->
       <div id="stagewrap">
         <canvas id="c" width="860" height="640"></canvas>
         <div id="w3" style="display:none"></div>
