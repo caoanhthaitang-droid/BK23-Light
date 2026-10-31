@@ -184,4 +184,129 @@ button:hover {
 button.on {
   background: var(--acc);
   color: #1a1100;
-  border-color: var
+  border-color: var(--acc);
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.note {
+  color: var(--mut);
+  font-size: 12px;
+  margin: 6px 0 0;
+}
+
+#sel {
+  min-height: 120px;
+}
+
+input[type="text"],
+select {
+  flex: 1;
+  background: #0f0e14;
+  color: var(--tx);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font: inherit;
+  min-width: 0;
+}
+
+.sv {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 8px;
+}
+
+.sv b {
+  font-weight: 600;
+}
+
+.sv small {
+  display: block;
+  color: var(--mut);
+  margin: 2px 0 6px;
+}
+
+nav {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: var(--tx);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+nav a.on {
+  background: var(--acc);
+  color: #1a1100;
+  border-color: var(--acc);
+}
+
+#gbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+#gbar label {
+  margin: 0;
+}
+
+#gbar input {
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px;
+}
+
+.page {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.page h2 {
+  font-size: 16px;
+  margin: 20px 0 6px;
+}
+
+.page h1 {
+  font-size: 20px;
+}
+
+.page p,
+.page li {
+  line-height: 1.65;
+}
+
+.page ul,
+.page ol {
+  padding-left: 20px;
+}
+
+.page .tip {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 10px 0;
+}
