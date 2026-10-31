@@ -1296,8 +1296,8 @@ G('tab_gv').onclick = async () => {
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
   // IN RA MÃ HASH ĐỂ KIỂM TRA TRONG F12 CONSOLE
-  console.log('Mã Hash trình duyệt tạo ra:', hashHex);
-  console.log('Mã Hash mẫu cần khớp:', window.APP_CONFIG.ADMIN_PIN_HASH);
+  // console.log('Mã Hash trình duyệt tạo ra:', hashHex);
+  // console.log('Mã Hash mẫu cần khớp:', window.APP_CONFIG.ADMIN_PIN_HASH);
 
   if (hashHex === window.APP_CONFIG.ADMIN_PIN_HASH) {
     isAdmin = true;
