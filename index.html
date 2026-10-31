@@ -31,51 +31,13 @@
   </div>
 
   <main>
-    <div>
-      <div class="row" style="margin-bottom:8px">
-        <button id="v2" class="on">Sơ đồ 2D</button>
-        <button id="v3b">Xem 3D</button>
-        <label style="display:inline-flex;margin:0 0 0 8px">
-          <input type="checkbox" id="lbl" checked>Nhãn đèn (3D)
-        </label>
-      </div>
-      <div id="stagewrap">
-        <canvas id="c" width="860" height="640"></canvas>
-        <div id="w3" style="display:none"></div>
-      </div>
-    </div>
-
-    <aside>
+    <aside id="rail-l" aria-label="Cảnh và cue">
+      <div class="rail-title">CẢNH &amp; CUE</div>
       <section>
-        <h2>Bàn điều khiển DMX</h2>
-        <label>
-          <b>Master</b>
-          <input id="master" type="range" min="0" max="100" value="100">
-        </label>
+        <h2>Cảnh có sẵn <small>phím 1–6</small></h2>
         <div class="row" id="scenes"></div>
         <p class="note" id="scenenote"></p>
       </section>
-
-      <section>
-        <h2>Máy phun khói 1500W</h2>
-        <div class="row">
-          <button id="fogbtn">Bật khói</button>
-        </div>
-        <label>
-          <b>Mật độ</b>
-          <input id="fog" type="range" min="0" max="100" value="50">
-        </label>
-        <p class="note">Có khói thì tia sáng hiện rõ. Máy khói công suất lớn nên phun theo từng đợt ngắn.</p>
-      </section>
-
-      <section>
-        <h2>Blinder (4 bóng)</h2>
-        <div class="row">
-          <button id="b2">Bật 2 bóng (1 mỗi trụ)</button>
-          <button id="b4" class="on">Bật cả 4 bóng</button>
-        </div>
-      </section>
-
       <section>
         <h2>Danh sách cue</h2>
         <div class="row">
@@ -98,7 +60,6 @@
         </label>
         <button id="cu_add">Thêm cue</button>
       </section>
-
       <section>
         <h2>Bản lưu (look và mood)</h2>
         <label>
@@ -124,7 +85,74 @@
         <div id="saves"></div>
         <p class="note" id="sv_note"></p>
       </section>
+    </aside>
 
+    <div id="stagebox">
+      <div class="row" style="margin-bottom:8px">
+        <button id="v2" class="on">Sơ đồ 2D</button>
+        <button id="v3b">Xem 3D</button>
+        <label style="display:inline-flex;margin:0 0 0 8px">
+          <input type="checkbox" id="lbl" checked>Nhãn đèn (3D)
+        </label>
+      </div>
+      <div id="stagewrap">
+        <canvas id="c" width="860" height="640"></canvas>
+        <div id="w3" style="display:none"></div>
+      </div>
+    </div>
+
+    <section id="console" aria-label="Bàn DMX 512">
+      <div class="con-head">
+        <h2>Bàn DMX 512 <span class="uni">Universe 1</span></h2>
+        <div class="row con-tools">
+          <button id="con_back" title="Lùi cue">◀</button>
+          <button id="con_go" class="on" title="Chạy cue tiếp theo (phím cách)">GO ▶</button>
+          <span class="con-cue" id="con_cue"></span>
+          <button id="patch_csv">Patch .csv</button>
+          <button id="patch_print">In patch</button>
+          <button id="mon_t" class="on">DMX monitor</button>
+        </div>
+      </div>
+      <div class="con-body">
+        <div id="faders" role="group" aria-label="Fader từng đèn"></div>
+        <div class="master">
+          <div class="ch-addr">MASTER</div>
+          <div class="ch-val" id="master-val">100%</div>
+          <div id="master-fader"></div>
+          <button id="bo" title="Tắt hết, bấm lần nữa để trả lại">BLACKOUT</button>
+        </div>
+      </div>
+      <input id="master" type="range" min="0" max="100" value="100" hidden>
+      <div id="dmxmon">
+        <canvas id="mon" width="832" height="336"></canvas>
+        <p class="note" id="mon_rd">Rê chuột vào một ô để xem kênh. Bấm vào ô để chọn đèn.</p>
+      </div>
+    </section>
+
+    <aside id="rail-r" aria-label="Thiết bị và sân khấu">
+      <div class="rail-title">THIẾT BỊ &amp; SÂN KHẤU</div>
+      <section id="sel">
+        <h2>Đèn đang chọn</h2>
+        <p class="note">Bấm vào một đèn trên sơ đồ để chỉnh.</p>
+      </section>
+      <section>
+        <h2>Máy phun khói 1500W</h2>
+        <div class="row">
+          <button id="fogbtn">Bật khói</button>
+        </div>
+        <label>
+          <b>Mật độ</b>
+          <input id="fog" type="range" min="0" max="100" value="50">
+        </label>
+        <p class="note">Có khói thì tia sáng hiện rõ. Máy khói công suất lớn nên phun theo từng đợt ngắn.</p>
+      </section>
+      <section>
+        <h2>Blinder (4 bóng)</h2>
+        <div class="row">
+          <button id="b2">Bật 2 bóng (1 mỗi trụ)</button>
+          <button id="b4" class="on">Bật cả 4 bóng</button>
+        </div>
+      </section>
       <section>
         <h2>Diễn viên và cảnh trí</h2>
         <div class="row" id="objbtns"></div>
@@ -136,11 +164,6 @@
           <input type="color" id="bgc" value="#3a3f6a">
         </label>
         <p class="note">Kéo diễn viên và cảnh trí trên sơ đồ 2D. Ở chế độ 3D, kéo chuột để xoay góc nhìn, cuộn để phóng to thu nhỏ.</p>
-      </section>
-
-      <section id="sel">
-        <h2>Đèn đang chọn</h2>
-        <p class="note">Bấm vào một đèn trên sơ đồ để chỉnh.</p>
       </section>
     </aside>
   </main>
@@ -168,7 +191,8 @@
       <li><b>Moving head beam:</b> chùm rất hẹp, quay được, hợp cho điểm nhấn và hiệu ứng quét.</li>
       <li><b>Trụ T:</b> hai trụ đặt hai bên khán giả, mỗi trụ mang 2 Par và 2 Blinder.</li>
       <li><b>Máy khói 1500W:</b> làm chùm sáng hiện rõ. Phun vừa đủ, khói nhiều sẽ che mất diễn viên.</li>
-      <li><b>Bàn DMX 512:</b> trang này mô phỏng bàn đó qua thanh Master, các cảnh và danh sách cue.</li>
+      <li><b>Bàn DMX 512:</b> phần "Bàn DMX 512" ở giữa trang mô phỏng bàn điều khiển. Mỗi đèn có một fader (độ sáng), ô chọn màu, nút SEL để chọn và nút FLASH để giữ sáng hết cỡ. Fader MASTER chỉnh độ sáng chung, BLACKOUT tắt hết và bấm lần nữa để trả lại. DMX monitor cho thấy giá trị 512 kênh đang xuất ra. Bảng patch liệt kê địa chỉ từng đèn, bạn tải .csv hoặc in ra cho người cắm dây.</li>
+      <li><b>Bố cục:</b> bên trái là Cảnh và Cue (cảnh có sẵn, danh sách cue, bản lưu). Bên phải là thiết bị và sân khấu (đèn đang chọn, khói, blinder, diễn viên, cảnh trí).</li>
     </ul>
 
     <h2>Mẹo thiết kế</h2>
@@ -212,5 +236,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="./config.js"></script>
   <script src="./app.js"></script>
+  <script src="./console.js"></script>
 </body>
 </html>
