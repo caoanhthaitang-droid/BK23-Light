@@ -1287,14 +1287,22 @@ G('tab_gv').onclick = async () => {
   const p = prompt('Nhập mã giáo viên');
   if (p === null) return;
 
-  const msgUint8 = new TextEncoder().encode(p);
+  // 1. Mã hóa chuỗi nhập vào sang UTF-8
+  const msgUint8 = new TextEncoder().encode(p.trim());
+  
+  // 2. Tính SHA-256 bằng Web Crypto API
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  
+  // 3. Chuyển Buffer thành chuỗi Hex 64 ký tự chuẩn (bắt buộc padStart(2, '0'))
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
+  // 4. So sánh với mã SHA-256 chuẩn của thai140625
   if (hashHex === window.APP_CONFIG.ADMIN_PIN_HASH) {
     isAdmin = true;
-    try { sessionStorage.setItem('adm', '1'); } catch (e) {}
+    try { 
+      sessionStorage.setItem('adm', '1'); 
+    } catch (e) {}
     initGroups();
     location.hash = 'quan-ly';
     route();
