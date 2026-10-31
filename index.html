@@ -32,10 +32,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 #sel{min-height:120px}
 input[type=text],select{flex:1;background:#0f0e14;color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;min-width:0}
 .sv{border:1px solid var(--line);border-radius:6px;padding:8px;margin-top:8px}.sv b{font-weight:600}.sv small{display:block;color:var(--mut);margin:2px 0 6px}
+nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}nav a{color:var(--tx);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px}nav a.on{background:var(--acc);color:#1a1100;border-color:var(--acc)}
+#gbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line)}#gbar label{margin:0}#gbar input{flex:1;min-width:120px;max-width:200px}
+.page{max-width:780px;margin:0 auto;padding:16px}.page h2{font-size:16px;margin:20px 0 6px}.page h1{font-size:20px}.page p,.page li{line-height:1.65}.page ul,.page ol{padding-left:20px}.page .tip{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:10px 0}
 </style>
 </head>
 <body>
-<header><h1>Bàn thiết kế ánh sáng sân khấu</h1><span>Kéo đèn để di chuyển, kéo chấm vòng tròn để chỉnh hướng chiếu. Phím 1–6 chọn cảnh.</span></header>
+<header><h1>Bàn thiết kế ánh sáng sân khấu</h1><span>Kéo đèn để di chuyển, kéo chấm vòng tròn để chỉnh hướng chiếu. Phím 1–6 chọn cảnh.</span><nav id="nav"><a href="#thiet-ke">Thiết kế</a><a href="#huong-dan">Hướng dẫn</a><a href="#quan-ly" id="tab_ql" style="display:none">Quản lý nhóm</a></nav></header>
+<div id="gbar"><label><b>Nhóm</b><select id="g_sel"></select></label><input id="g_name" type="text" maxlength="30" placeholder="Tên nhóm mới"><button id="g_new">Tạo nhóm</button><button id="g_submit">Nộp kịch bản</button><span class="note" id="g_st" style="margin:0"></span></div>
 <main>
 <div><div class="row" style="margin-bottom:8px"><button id="v2" class="on">Sơ đồ 2D</button><button id="v3b">Xem 3D</button><label style="display:inline-flex;margin:0 0 0 8px"><input type="checkbox" id="lbl" checked>Nhãn đèn (3D)</label></div><div id="stagewrap"><canvas id="c" width="860" height="640"></canvas><div id="w3" style="display:none"></div></div></div>
 <aside>
@@ -67,6 +71,41 @@ input[type=text],select{flex:1;background:#0f0e14;color:var(--tx);border:1px sol
 <section id="sel"><h2>Đèn đang chọn</h2><p class="note">Bấm vào một đèn trên sơ đồ để chỉnh.</p></section>
 </aside>
 </main>
+<div class="page" id="v_huong-dan" style="display:none">
+<h1>Hướng dẫn dùng bàn thiết kế ánh sáng</h1>
+<p>Trang này là nơi các nhóm thực hành xếp đèn, chạy ánh sáng và soạn kịch bản ánh sáng trước khi lên sân khấu thật.</p>
+<h2>Quy trình cho một nhóm</h2>
+<ol><li><b>Chọn hoặc tạo nhóm</b> ở thanh "Nhóm" ngay dưới tiêu đề. Bản lưu và danh sách cue chỉ thuộc về nhóm đang chọn.</li>
+<li><b>Xếp đèn:</b> kéo từng đèn trên sơ đồ 2D, kéo chấm tròn để chỉnh hướng chiếu. Kéo trụ T thì các đèn trên trụ đi theo.</li>
+<li><b>Đặt diễn viên và cảnh trí</b> (tường, bục, bàn, cây), chọn màu phông để nhìn ánh sáng rơi lên người và vật.</li>
+<li><b>Chỉnh từng khoảnh khắc:</b> bấm vào đèn, chỉnh độ sáng, màu, góc chùm, strobe. Dùng 6 cảnh DMX có sẵn làm điểm xuất phát.</li>
+<li><b>Lưu thành bản lưu:</b> đặt tên theo cảnh (ví dụ "Cảnh 2, phòng khách"), chọn mood rồi bấm "Lưu bản mới". Mỗi bản lưu giữ đủ đèn, khói, diễn viên và cảnh trí.</li>
+<li><b>Xếp cue:</b> thêm các bản lưu vào "Danh sách cue" theo đúng thứ tự vở kịch, đặt số giây chuyển và ghi chú thời điểm chạy.</li>
+<li><b>Chạy thử:</b> bấm GO hoặc phím cách để chạy từng cue, chuyển sang "Xem 3D" để nhìn từ ghế khán giả.</li>
+<li><b>Nộp kịch bản</b> khi xong. Giáo viên sẽ xem, ghi chú và duyệt.</li></ol>
+<h2>Các thiết bị</h2>
+<ul><li><b>Par LED:</b> đèn màu chùm vừa. Có 4 đèn đặt sàn đánh phông, 4 đèn trên trụ T đánh mặt diễn viên.</li>
+<li><b>Blinder:</b> đèn chói ấm, chùm rộng, dùng sáng toàn cảnh hoặc nhấn mạnh một khoảnh khắc. Có thể bật 2 hoặc 4 bóng.</li>
+<li><b>Moving head beam:</b> chùm rất hẹp, quay được, hợp cho điểm nhấn và hiệu ứng quét.</li>
+<li><b>Trụ T:</b> hai trụ đặt hai bên khán giả, mỗi trụ mang 2 Par và 2 Blinder.</li>
+<li><b>Máy khói 1500W:</b> làm chùm sáng hiện rõ. Phun vừa đủ, khói nhiều sẽ che mất diễn viên.</li>
+<li><b>Bàn DMX 512:</b> trang này mô phỏng bàn đó qua thanh Master, các cảnh và danh sách cue.</li></ul>
+<h2>Mẹo thiết kế</h2>
+<ul><li>Đèn đánh mặt nên chiếu từ hai bên, hơi cao, để thấy mặt diễn viên mà không làm họ chói mắt.</li>
+<li>Màu ấm (vàng, cam) cho cảm giác gần gũi, ban ngày. Màu lạnh (xanh) cho đêm, buồn, bí ẩn. Đỏ cho căng thẳng.</li>
+<li>Mỗi cue nên thay đổi ít, và chuyển mượt 2 đến 4 giây để khán giả không bị giật mình.</li></ul>
+<div class="tip"><b>An toàn:</b> đèn nháy nhanh (strobe) có thể gây hại cho người nhạy cảm ánh sáng. Dùng ngắn, không nháy quá 3 lần mỗi giây, và báo trước cho khán giả.</div>
+<h2>Phím tắt</h2>
+<ul><li>Phím 1 đến 6: chọn cảnh DMX có sẵn. Phím cách: GO, chạy cue tiếp theo. Mũi tên trái: lùi cue.</li><li>Phím tắt không hoạt động khi bạn đang gõ chữ hoặc đang chọn một nút.</li></ul>
+<h2>Câu hỏi thường gặp</h2>
+<ul><li><b>Bản lưu nằm ở đâu?</b> Nếu dòng chữ dưới danh sách bản lưu ghi "dùng chung", mọi người mở trang đều thấy. Nếu ghi "chỉ nằm trên máy này", đổi máy hoặc xóa dữ liệu trình duyệt là mất. Hãy tải file .json về để dự phòng.</li>
+<li><b>Nhóm bị khóa?</b> Giáo viên đã khóa để chốt kịch bản. Bạn vẫn mở và chạy được, nhưng không sửa được cho tới khi mở khóa.</li>
+<li><b>Không thấy 3D?</b> Cần có Internet để tải thư viện 3D.</li></ul>
+</div>
+<div class="page" id="v_quan-ly" style="display:none">
+<h1>Quản lý nhóm</h1>
+<p class="note">Xem các nhóm, số bản lưu, số cue và trạng thái. "Mở nhóm" để xem và chạy kịch bản của nhóm đó. "Khóa" chặn nhóm chỉnh sửa. Ô ghi chú sẽ hiện ở thanh nhóm của họ.</p>
+<div id="adm"></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const cv=document.getElementById('c'),ctx=cv.getContext('2d'),W=860,H=640,S=40;
@@ -272,16 +311,50 @@ function applySnap(str){const s=JSON.parse(str);if(!Array.isArray(s.F)||s.F.leng
  auto=s.auto;scene=s.scene;[...sc.children].forEach((b,j)=>b.classList.toggle('on',j==scene));G('scenenote').textContent=scene>=0?SC[scene][2]:'';sel=null;selO=null;renderSel()}
 const lsGet=()=>{try{return JSON.parse(localStorage.getItem('looks')||'{}')}catch(e){return{}}};
 const toArr=o=>Object.keys(o).map(k=>({id:k,...o[k]}));
-async function putSave(id,meta){const d={name:meta.name,group:meta.group,mood:meta.mood,snap:snap(),ts:Date.now()};id=id||Date.now().toString(36)+Math.random().toString(36).slice(2,5);
- try{if(db)await db.collection('looks').doc(id).set(d);else{const l=lsGet();l[id]=d;localStorage.setItem('looks',JSON.stringify(l));saves=toArr(l);renderSaves()}note('Đã lưu "'+meta.name+'".')}catch(e){note('Không lưu được: '+((e&&(e.message||e.code))||'lỗi không rõ'))}}
+async function putSave(id,meta){if(!canEd())return;const d={name:meta.name,group:meta.group,gid:meta.gid!==undefined?meta.gid:curG,mood:meta.mood,snap:snap(),ts:Date.now()};id=id||Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+ try{if(db)await db.collection('looks').doc(id).set(d);else{const l=lsGet();l[id]=d;localStorage.setItem('looks',JSON.stringify(l));allSaves=toArr(l);refilter();renderSaves()}note('Đã lưu "'+meta.name+'".');gupd({})}catch(e){note('Không lưu được: '+((e&&(e.message||e.code))||'lỗi không rõ'))}}
 function two(b,label,fn){const t=b.textContent;b.onclick=()=>{if(b.dataset.arm){clearTimeout(+b.dataset.arm);b.dataset.arm='';b.textContent=t;fn();return}b.textContent=label;b.dataset.arm=setTimeout(()=>{b.dataset.arm='';b.textContent=t},3000)}}
 function renderSaves(){renderCues();const box=G('saves');box.textContent='';const f=G('sv_f').value,arr=saves.filter(s=>!f||s.mood===f).sort((a,b)=>b.ts-a.ts);
  if(!arr.length){const p=document.createElement('p');p.className='note';p.textContent='Chưa có bản lưu nào.';box.appendChild(p);return}
  arr.forEach(s=>{const d=document.createElement('div');d.className='sv';const nm=document.createElement('b');nm.textContent=s.name;const sm=document.createElement('small');sm.textContent=(s.group||'Chưa ghi nhóm')+' | '+s.mood+' | '+new Date(s.ts).toLocaleDateString('vi-VN');
   const r=document.createElement('div');r.className='row';const mb=(t,fn)=>{const b=document.createElement('button');b.textContent=t;r.appendChild(b);return b};
   mb('Mở').onclick=()=>{try{applySnap(s.snap);note('Đã mở "'+s.name+'".')}catch(e){note('Bản lưu này bị lỗi, không mở được.')}};
-  two(mb('Ghi đè'),'Bấm lần nữa để ghi đè',()=>putSave(s.id,s));two(mb('Xóa'),'Bấm lần nữa để xóa',async()=>{try{if(db)await db.collection('looks').doc(s.id).delete();else{const l=lsGet();delete l[s.id];localStorage.setItem('looks',JSON.stringify(l));saves=toArr(l);renderSaves()}}catch(e){note('Không xóa được.')}});
+  two(mb('Ghi đè'),'Bấm lần nữa để ghi đè',()=>putSave(s.id,s));two(mb('Xóa'),'Bấm lần nữa để xóa',async()=>{if(!canEd())return;try{if(db)await db.collection('looks').doc(s.id).delete();else{const l=lsGet();delete l[s.id];localStorage.setItem('looks',JSON.stringify(l));allSaves=toArr(l);refilter();renderSaves()}}catch(e){note('Không xóa được.')}});
   d.append(nm,sm,r);box.appendChild(d)})}
+let groups=[],allSaves=[],curG='',isAdmin=true,unsubC=null,lastKey=null;try{curG=localStorage.getItem('curG')||''}catch(e){}
+const lsGetG=()=>{try{return JSON.parse(localStorage.getItem('groups')||'{}')}catch(e){return{}}};
+const grp=()=>groups.find(g=>g.id==curG),gname=()=>curG?(grp()||{}).name||'(nhóm đã xóa)':'Chung';
+const isLocked=()=>!!(grp()&&grp().locked)&&!isAdmin;
+const canEd=()=>{if(isLocked()){note('Nhóm này đang bị khóa, hãy nhờ giáo viên mở khóa.');return false}return true};
+const refilter=()=>{saves=allSaves.filter(s=>(s.gid||'')===curG)};
+G('sv_g').closest('label').style.display='none';
+function gupd(p,id=curG){const g=groups.find(x=>x.id==id);if(!id||!g)return;Object.assign(g,p,{ts:Date.now()});try{if(db)db.collection('groups').doc(id).update({...p,ts:g.ts}).catch(()=>{});else{const l=lsGetG();l[id]=g;localStorage.setItem('groups',JSON.stringify(l))}}catch(e){}initGroups()}
+function gstatus(){const g=grp(),b=G('g_submit');b.style.display=g?'':'none';if(g)b.textContent=(g.status||'nháp')=='nháp'?'Nộp kịch bản':'Nộp lại';G('g_st').textContent=g?('Trạng thái: '+(g.status||'nháp')+(g.locked?', đang khóa':'')+(g.tnote?'. Giáo viên nhắn: '+g.tnote:'')):'Chọn hoặc tạo nhóm để bản lưu và cue của bạn nằm riêng.'}
+function initGroups(){G('tab_ql').style.display=isAdmin?'':'none';const sl=G('g_sel'),v=curG;sl.textContent='';sl.add(new Option('Chung (chưa chia nhóm)',''));groups.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(g=>sl.add(new Option(g.name,g.id)));sl.value=v;
+ refilter();renderSaves();renderAdmin();gstatus();if(lastKey!==curG){lastKey=curG;subCues()}}
+function subCues(){if(unsubC){try{unsubC()}catch(e){}unsubC=null}cues=[];cur=-1;const k=curG||'main';
+ if(db){unsubC=db.doc('cues/'+k).onSnapshot(q=>{try{cues=q.exists?JSON.parse(q.data().list):[]}catch(e){cues=[]}renderCues()},()=>{})}
+ else{try{cues=JSON.parse(localStorage.getItem('cues_'+k)||'[]')}catch(e){cues=[]}}renderCues()}
+async function delGroup(g){try{if(db){for(const s of allSaves.filter(s=>s.gid==g.id))await db.collection('looks').doc(s.id).delete();await db.doc('cues/'+g.id).delete();await db.collection('groups').doc(g.id).delete()}
+ else{const l=lsGetG();delete l[g.id];localStorage.setItem('groups',JSON.stringify(l));const ls=lsGet();Object.keys(ls).forEach(k=>{if(ls[k].gid==g.id)delete ls[k]});localStorage.setItem('looks',JSON.stringify(ls));localStorage.removeItem('cues_'+g.id);groups=toArr(l);allSaves=toArr(ls)}
+ if(curG==g.id)curG='';initGroups()}catch(e){note('Không xóa được nhóm.')}}
+function renderAdmin(){const box=G('adm');box.textContent='';
+ [{id:'',name:'Chung (chưa chia nhóm)',virtual:1},...groups.slice().sort((a,b)=>a.name.localeCompare(b.name))].forEach(g=>{const n=allSaves.filter(s=>(s.gid||'')===g.id).length,d=document.createElement('div');d.className='sv';
+  const nm=document.createElement('b');nm.textContent=g.name;const sm=document.createElement('small');sm.textContent=n+' bản lưu'+(g.virtual?'':' | '+(g.ncue||0)+' cue | '+(g.status||'nháp')+(g.locked?' | đã khóa':'')+' | cập nhật '+new Date(g.ts||0).toLocaleString('vi-VN'));
+  const r=document.createElement('div');r.className='row';const mb=(t,fn)=>{const b=document.createElement('button');b.textContent=t;b.onclick=fn;r.appendChild(b);return b};
+  mb('Mở nhóm',()=>{curG=g.id;try{localStorage.setItem('curG',curG)}catch(e){}initGroups();location.hash='thiet-ke'});
+  if(!g.virtual){mb(g.locked?'Mở khóa':'Khóa',()=>gupd({locked:!g.locked},g.id));mb(g.status=='đã duyệt'?'Bỏ duyệt':'Duyệt',()=>gupd({status:g.status=='đã duyệt'?'nháp':'đã duyệt'},g.id));two(mb('Xóa nhóm'),'Bấm lần nữa để xóa',()=>delGroup(g))}
+  d.append(nm,sm,r);
+  if(!g.virtual){const tn=document.createElement('input');tn.type='text';tn.placeholder='Ghi chú gửi nhóm';tn.value=g.tnote||'';tn.maxLength=120;tn.style.cssText='margin-top:6px;width:100%';tn.onchange=()=>gupd({tnote:tn.value.trim()},g.id);d.appendChild(tn)}
+  box.appendChild(d)})}
+function route(){const h=(location.hash||'#thiet-ke').slice(1),v=['thiet-ke','huong-dan','quan-ly'].includes(h)?h:'thiet-ke',ok=v=='quan-ly'&&!isAdmin?'thiet-ke':v;
+ document.querySelector('main').style.display=ok=='thiet-ke'?'':'none';G('gbar').style.display=ok=='thiet-ke'?'':'none';G('v_huong-dan').style.display=ok=='huong-dan'?'':'none';G('v_quan-ly').style.display=ok=='quan-ly'?'':'none';
+ document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')=='#'+ok))}
+addEventListener('hashchange',route);
+G('g_sel').onchange=()=>{curG=G('g_sel').value;try{localStorage.setItem('curG',curG)}catch(e){}initGroups()};
+G('g_submit').onclick=()=>{if(canEd())gupd({status:'đã nộp'})};
+G('g_new').onclick=async()=>{const n=G('g_name').value.trim();if(!n)return;const id='g'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),g={id,name:n,locked:false,status:'nháp',ncue:0,ts:Date.now()};
+ try{if(db){const{id:_,...rest}=g;await db.collection('groups').doc(id).set(rest)}else{const l=lsGetG();l[id]=g;localStorage.setItem('groups',JSON.stringify(l));groups=toArr(l)}curG=id;try{localStorage.setItem('curG',id)}catch(e){}G('g_name').value='';initGroups()}catch(e){note('Không tạo được nhóm.')}};
 let cues=[],cur=-1,fade=null;
 function startFade(str,secs){const s=JSON.parse(str);if(!Array.isArray(s.F)||s.F.length!=F.length)throw 0;
  if(!(secs>.05)){fade=null;applySnap(str);return}
@@ -289,28 +362,29 @@ function startFade(str,secs){const s=JSON.parse(str);if(!Array.isArray(s.F)||s.F
  const from=F.map(cp),bg0=rgb(bgCol);fade=null;applySnap(str);const to=F.map(cp),bg1=rgb(bgCol),bgEnd=bgCol,au=auto;
  F.forEach((f,i)=>{P.forEach(p=>f[p]=from[i][p]);f.col=from[i].col.slice()});auto=null;bgCol=hex(bg0);
  fade={t0:performance.now()/1000,secs,from,to,bg0,bg1,bgEnd,au}}
-function cueSave(){const s=JSON.stringify(cues);try{if(db)db.doc('cues/main').set({list:s,ts:Date.now()});else localStorage.setItem('cues',s)}catch(e){}}
+function cueSave(){const s=JSON.stringify(cues),k=curG||'main';try{if(db)db.doc('cues/'+k).set({list:s,ts:Date.now()});else localStorage.setItem('cues_'+k,s)}catch(e){}gupd({ncue:cues.length})}
 function playCue(i){if(i<0||i>=cues.length)return;const c=cues[i],s=saves.find(x=>x.id==c.sid);if(!s){G('cu_st').textContent='Cue '+(i+1)+': bản lưu đã bị xóa.';return}
  try{startFade(s.snap,c.fade);cur=i;renderCues()}catch(e){G('cu_st').textContent='Không chạy được cue '+(i+1)+'.'}}
-function mv(i,d){const j=i+d;if(j<0||j>=cues.length)return;[cues[i],cues[j]]=[cues[j],cues[i]];if(cur==i)cur=j;else if(cur==j)cur=i;cueSave();renderCues()}
+function mv(i,d){if(!canEd())return;const j=i+d;if(j<0||j>=cues.length)return;[cues[i],cues[j]]=[cues[j],cues[i]];if(cur==i)cur=j;else if(cur==j)cur=i;cueSave();renderCues()}
 function renderCues(){const sl=G('cu_s'),v=sl.value;sl.textContent='';saves.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>sl.add(new Option(s.name+' ('+s.mood+')',s.id)));if(v)sl.value=v;
  const box=G('cues');box.textContent='';
  cues.forEach((c,i)=>{const s=saves.find(x=>x.id==c.sid),d=document.createElement('div');d.className='sv';if(i==cur)d.style.borderColor='var(--acc)';
   const nm=document.createElement('b');nm.textContent=(i+1)+'. '+(s?s.name:'(bản lưu đã xóa)');const sm=document.createElement('small');sm.textContent='Chuyển '+c.fade+' giây'+(c.note?' | '+c.note:'');
   const r=document.createElement('div');r.className='row';const mb=(t,fn)=>{const b=document.createElement('button');b.textContent=t;b.onclick=fn;r.appendChild(b)};
-  mb('Chạy',()=>playCue(i));mb('▲',()=>mv(i,-1));mb('▼',()=>mv(i,1));mb('Xóa',()=>{cues.splice(i,1);if(cur>=cues.length)cur=cues.length-1;cueSave();renderCues()});
+  mb('Chạy',()=>playCue(i));mb('▲',()=>mv(i,-1));mb('▼',()=>mv(i,1));mb('Xóa',()=>{if(!canEd())return;cues.splice(i,1);if(cur>=cues.length)cur=cues.length-1;cueSave();renderCues()});
   d.append(nm,sm,r);box.appendChild(d)});
  G('cu_st').textContent=cues.length?(cur>=0?'Đang ở cue '+(cur+1)+' / '+cues.length:'Sẵn sàng, bấm GO để chạy cue 1.'):'Thêm bản lưu vào danh sách để bắt đầu.'}
-G('cu_add').onclick=()=>{const sid=G('cu_s').value;if(!sid)return;cues.push({sid,fade:Math.max(0,Math.min(60,+G('cu_f').value||0)),note:G('cu_n').value.trim()});G('cu_n').value='';cueSave();renderCues()};
+G('cu_add').onclick=()=>{if(!canEd())return;const sid=G('cu_s').value;if(!sid)return;cues.push({sid,fade:Math.max(0,Math.min(60,+G('cu_f').value||0)),note:G('cu_n').value.trim()});G('cu_n').value='';cueSave();renderCues()};
 G('cu_go').onclick=()=>playCue(cur+1>=cues.length?cur:cur+1);G('cu_back').onclick=()=>playCue(Math.max(0,cur-1));
 addEventListener('keydown',e=>{const t=e.target.tagName;if(t=='INPUT'||t=='SELECT'||t=='TEXTAREA'||t=='BUTTON')return;if(e.code=='Space'){e.preventDefault();G('cu_go').click()}else if(e.key=='ArrowLeft')G('cu_back').click()});
-G('sv_save').onclick=()=>{const n=G('sv_n').value.trim();if(!n){note('Hãy đặt tên cho bản lưu.');return}putSave(null,{name:n,group:G('sv_g').value.trim(),mood:G('sv_m').value})};
+G('sv_save').onclick=()=>{const n=G('sv_n').value.trim();if(!n){note('Hãy đặt tên cho bản lưu.');return}putSave(null,{name:n,group:gname(),mood:G('sv_m').value})};
 (async()=>{G('sv_exp').style.display='none';
  if(typeof claude!='undefined'){try{db=await claude.use('db')}catch(e){db=null}
+  if(db){try{const u=await claude.use('user');isAdmin=!!(u&&u.canEdit())}catch(e){isAdmin=false}}
   try{const dl=await claude.use('downloads');if(dl){G('sv_exp').style.display='';G('sv_exp').onclick=async()=>{try{await dl.save({filename:'ban-luu-anh-sang.json',data:JSON.stringify(saves.map(({id,...r})=>r))})}catch(e){}}}}catch(e){}}
- if(db){db.doc('cues/main').onSnapshot(q=>{if(q.exists){try{cues=JSON.parse(q.data().list)}catch(e){}renderCues()}},()=>{});db.collection('looks').onSnapshot(q=>{saves=q.docs.map(d=>({id:d.id,...d.data()}));renderSaves()},e=>note('Không đọc được bản lưu chung.'));note('Bản lưu dùng chung: mọi người mở trang này đều thấy.')}
- else{try{cues=JSON.parse(localStorage.getItem('cues')||'[]')}catch(e){}saves=toArr(lsGet());renderSaves();note('Bản lưu chỉ nằm trên máy này (chưa đăng nhập hoặc chưa có quyền).')}})();
-setScene(1);requestAnimationFrame(frame);
+ if(db){db.collection('groups').onSnapshot(q=>{groups=q.docs.map(d=>({id:d.id,...d.data()}));initGroups()},()=>{});db.collection('looks').onSnapshot(q=>{allSaves=q.docs.map(d=>({id:d.id,...d.data()}));refilter();renderSaves();renderAdmin()},e=>note('Không đọc được bản lưu chung.'));note('Bản lưu dùng chung: mọi người mở trang này đều thấy.')}
+ else{groups=toArr(lsGetG());allSaves=toArr(lsGet());initGroups();note('Bản lưu chỉ nằm trên máy này (chưa đăng nhập hoặc chưa có quyền).')}initGroups();route()})();
+route();setScene(1);requestAnimationFrame(frame);
 </script>
 </body>
 </html>
