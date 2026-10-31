@@ -38,6 +38,25 @@ nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}nav a{color:var(--tx);t
 </style>
 </head>
 <body>
+ <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDX-fzlQA1Uto2E4s_ysekTpz11Bf4RDD0",
+    authDomain: "bk23-18237.firebaseapp.com",
+    projectId: "bk23-18237",
+    storageBucket: "bk23-18237.firebasestorage.app",
+    messagingSenderId: "591493643354",
+    appId: "1:591493643354:web:6d07d263be62964319ec63"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
 <header><h1>Bàn thiết kế ánh sáng sân khấu</h1><span>Kéo đèn để di chuyển, kéo chấm vòng tròn để chỉnh hướng chiếu. Phím 1–6 chọn cảnh.</span><nav id="nav"><a href="#thiet-ke">Thiết kế</a><a href="#huong-dan">Hướng dẫn</a><a href="#quan-ly" id="tab_ql" style="display:none">Quản lý nhóm</a></nav></header>
 <div id="gbar"><label><b>Nhóm</b><select id="g_sel"></select></label><input id="g_name" type="text" maxlength="30" placeholder="Tên nhóm mới"><button id="g_new">Tạo nhóm</button><button id="g_submit">Nộp kịch bản</button><span class="note" id="g_st" style="margin:0"></span></div>
 <main>
